@@ -1,18 +1,11 @@
 const express = require("express");
-const { faker } = require("@faker-js/faker");
+const CategoriesService = require('./../services/categories.service');
+
 const router=express.Router();
+const serviceCategories=new CategoriesService();
 
 router.get('/',(req,res)=>{
-  const categories=[];
-  const {size}=req.query;
-  const limit =size||10;
-  for (let index = 0; index < limit; index++) {
-    categories.push({
-      id:faker.number.int(),
-      name:faker.commerce.productName(),
-      image:faker.image.url()
-  })
-  }
+  const categories=serviceCategories.find();
   res.json(categories);
 });
 
