@@ -1,5 +1,12 @@
 const express = require('express');
 const ProductsService = require('./../services/product.service');
+const validatorHandler = require('./../middlewares/validator.handler');
+const {
+  createProductSchema,
+  updateProductSchema,
+  getProductSchema,
+} = require('./../schemas/product.schema');
+
 const router = express.Router();
 const service = new ProductsService();
 
@@ -11,39 +18,50 @@ router.get('/', async (req, res) => {
 router.get('/filter', (req, res) => {
   res.send('yo soy un fillter');
 });
-router.get('/:id', async (req, res, next) => {
-  // if(id==='999'){
-  //   res.status(404).json({
-  //     message:"Not found"
-  //   });
-  // }else{
-  //   res.status(200).json({
-  //     id,
-  //     name:'product 2',
-  //     price:2000
-  //   });
-  // }
-  try {
-    const { id } = req.params;
-    const product = await service.findOne(id);
-    res.json(product);
-  } catch (error) {
-    next(error);
-  }
-});
+router.get(
+  '/:id',
+  validatorHandler(getProductSchema, 'params'),
+  async (req, res, next) => {
+    // if(id==='999'){
+    //   res.status(404).json({
+    //     message:"Not found"
+    //   });
+    // }else{
+    //   res.status(200).json({
+    //     id,
+    //     name:'product 2',
+    //     price:2000
+    //   });
+    // }
+    try {
+      const { id } = req.params;
+      const product = await service.findOne(id);
+      res.json(product);
+    } catch (error) {
+      next(error);
+    }
+  },
+);
 
-router.post('/', async (req, res) => {
-  const body = req.body;
-  // res.status(201).json({
-  //   message:'Created',
-  //   data:body
-  // })
-  const newProduct = await service.create(body);
-  res.status(201).json(newProduct);
-});
+router.post(
+  '/',
+  validatorHandler(createProductSchema, 'body'),
+  async (req, res) => {
+    const body = req.body;
+    // res.status(201).json({
+    //   message:'Created',
+    //   data:body
+    // })
+    const newProduct = await service.create(body);
+    res.status(201).json(newProduct);
+  },
+);
 //el patch y el put hacen la misma accion , se puede utilizar para actualizar , solo que por convencion se indica que el put se le tiene que enviar todo los campos del
 //objeto , el patch no ,este puede ser parcial
-router.patch('/:id', async (req, res,next) => {
+router.patch('/:id',
+validatorHandler(getProductSchema, 'params'),
+validatorHandler(updateProductSchema, 'body'),
+ async (req, res, next) => {
   try {
     const { id } = req.params;
     const body = req.body;
