@@ -1,10 +1,14 @@
 const { faker } = require('@faker-js/faker');
-const boom=require('@hapi/boom');
+const boom = require('@hapi/boom');
+
+const pool = require('./../libs/postgres.pool');
 
 class ProductsService {
   constructor() {
     this.products = [];
     this.generate();
+    this.pool = pool;
+    this.pool.on('error', (err) => console.log(err));
   }
   generate() {
     const limit = 100;
@@ -14,7 +18,7 @@ class ProductsService {
         name: faker.commerce.productName(),
         price: parseInt(faker.commerce.price(), 10),
         image: faker.image.url(),
-        isBlock:faker.datatype.boolean(),
+        isBlock: faker.datatype.boolean(),
       });
     }
   }
@@ -27,22 +31,25 @@ class ProductsService {
     return newProduct;
   }
 
-  find() {
-    return new Promise((resolve,reject)=>{
-      setTimeout(()=>{
-        resolve(this.products);
-      },5000);
-    });
+  async find() {
+    const query = 'select * from tasks';
+    const rta = await this.pool.query(query);
+    return rta.rows;
+    // return new Promise((resolve,reject)=>{
+    //   setTimeout(()=>{
+    //     resolve(this.products);
+    //   },5000);
+    // });
     // return this.products;
   }
 
   async findOne(id) {
-    const product= this.products.find((item) => item.id === id);
-    if(!product){
-      throw boom.notFound("Product not found");
+    const product = this.products.find((item) => item.id === id);
+    if (!product) {
+      throw boom.notFound('Product not found');
     }
-    if(product.isBlock){
-      throw boom.conflict("Product is block");
+    if (product.isBlock) {
+      throw boom.conflict('Product is block');
     }
     return product;
   }
