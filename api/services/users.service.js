@@ -1,41 +1,66 @@
-const { faker } = require("@faker-js/faker");
-const getConnection=require('../libs/postgres')
-const pool=require('./../libs/postgres.pool');
+const { faker } = require('@faker-js/faker');
+const { models } = require('./../libs/sequelize');
+const boom = require('@hapi/boom');
+// const getConnection=require('../libs/postgres')
+// const pool=require('./../libs/postgres.pool');
 class UsersService {
   constructor() {
     this.users = [];
     this.generate();
-    this.pool=pool;
-    this.pool.on('error', (err) => console.log("el error es"+err));
+    // this.pool=pool;
+    // this.pool.on('error', (err) => console.log("el error es"+err));
   }
   generate() {
     const limit = 100;
     for (let index = 0; index < limit; index++) {
       this.users.push({
-        id: faker.datatype.uuid(),
+        id: faker.string.uuid(),
         name: faker.person.fullName(),
         image: faker.image.url(),
       });
     }
   }
-  create() {}
+  async create(data) {
+    const newUser = await models.User.create(data);
+    return newUser;
+  }
 
   async find() {
-    const query='select * from tasks';
-    const rta=await this.pool.query(query);
-    return rta.rows;
+    const rta = await models.User.findAll();
+    return rta;
+    // const query='select * from tasks';
+    // try {
+    //   const rta=await this.pool.query(query);
+    //   return rta.rows;
+    // } catch (e) {
+    //  console.log("aca");
+    // }
+
     // const client = await getConnection();
     // const rta = await client.query('SELECT * FROM tasks');
     // return rta.rows;
   }
 
-  findOne(id) {
-    return this.users.find((user) => user.id === id);
+  async findOne(id) {
+    const user = await models.User.findByPk(id);
+    if(!user){
+      throw boom.notFound('user not found');
+    }
+    return  user ;
+    // return this.users.find((user) => user.id === id);
   }
 
-  update() {}
+  async update(id, changes) {
+    const user = await this.findOne(id);
+    const rta = await user.update(changes);
+    return rta;
+  }
 
-  delete() {}
+  async delete(id) {
+    const user =  await this.findOne(id);
+    await user.destroy();
+    return { id };
+  }
 }
 
 module.exports = UsersService;

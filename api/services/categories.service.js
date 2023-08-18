@@ -9,7 +9,7 @@ class CategoriesService {
     const limit = 100;
     for (let index = 0; index < limit; index++) {
       this.categories.push({
-        id: faker.datatype.uuid(),
+        id: faker.string.uuid(),
         name: faker.commerce.productName(),
         image: faker.image.url(),
       });

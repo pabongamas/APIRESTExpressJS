@@ -1,20 +1,21 @@
 const { faker } = require('@faker-js/faker');
 const boom = require('@hapi/boom');
 
-const pool = require('./../libs/postgres.pool');
+// const pool = require('./../libs/postgres.pool');
+ const sequelize = require('../libs/sequelize');
 
 class ProductsService {
   constructor() {
     this.products = [];
     this.generate();
-    this.pool = pool;
-    this.pool.on('error', (err) => console.log(err));
+    // this.pool = pool;
+    // this.pool.on('error', (err) => console.log(err));
   }
   generate() {
     const limit = 100;
     for (let index = 0; index < limit; index++) {
       this.products.push({
-        id: faker.datatype.uuid(),
+        id: faker.string.uuid(),
         name: faker.commerce.productName(),
         price: parseInt(faker.commerce.price(), 10),
         image: faker.image.url(),
@@ -32,9 +33,15 @@ class ProductsService {
   }
 
   async find() {
-    const query = 'select * from tasks';
-    const rta = await this.pool.query(query);
-    return rta.rows;
+    const query='select * FROM tasks';
+    const [data]=await sequelize.query(query);
+    return data;
+    //esta es usando el pool de conexiones
+    // const query = 'select * from tasks';
+    // const rta = await this.pool.query(query);
+    // return rta.rows;
+
+
     // return new Promise((resolve,reject)=>{
     //   setTimeout(()=>{
     //     resolve(this.products);
