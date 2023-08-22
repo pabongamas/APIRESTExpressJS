@@ -1,33 +1,39 @@
-const { faker } = require('@faker-js/faker');
+const boom = require('@hapi/boom');
+
+const { models }= require('./../libs/sequelize');
 
 class CategoriesService {
   constructor() {
     this.categories = [];
-    this.generate();
   }
-  generate() {
-    const limit = 100;
-    for (let index = 0; index < limit; index++) {
-      this.categories.push({
-        id: faker.string.uuid(),
-        name: faker.commerce.productName(),
-        image: faker.image.url(),
-      });
-    }
-  }
-  create() {}
-
-  find() {
-    return this.categories;
+  async create(data) {
+    const newCategory = await models.Category.create(data);
+    return newCategory;
   }
 
-  findOne(id) {
-    return this.categories.find((categorie) => categorie.id === id);
+  async find() {
+    const categories = await models.Category.findAll();
+    return categories;
   }
 
-  update() {}
+  async findOne(id) {
+    const category = await models.Category.findByPk(id, {
+      include: ['products']
+    });
+    return category;
+  }
 
-  delete() {}
+  async update(id, changes) {
+    return {
+      id,
+      changes,
+    };
+  }
+
+  async delete(id) {
+    return { id };
+  }
+
 }
 
 module.exports = CategoriesService;
