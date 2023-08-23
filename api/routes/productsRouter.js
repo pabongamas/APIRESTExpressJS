@@ -43,18 +43,17 @@ router.get(
   },
 );
 
-router.post(
-  '/',
+router.post('/',
   validatorHandler(createProductSchema, 'body'),
-  async (req, res) => {
-    const body = req.body;
-    // res.status(201).json({
-    //   message:'Created',
-    //   data:body
-    // })
-    const newProduct = await service.create(body);
-    res.status(201).json(newProduct);
-  },
+  async (req, res, next) => {
+    try {
+      const body = req.body;
+      const newProduct = await service.create(body);
+      res.status(201).json(newProduct);
+    } catch (error) {
+      next(error);
+    }
+  }
 );
 //el patch y el put hacen la misma accion , se puede utilizar para actualizar , solo que por convencion se indica que el put se le tiene que enviar todo los campos del
 //objeto , el patch no ,este puede ser parcial
