@@ -1,39 +1,44 @@
 const boom = require('@hapi/boom');
 
-const { models }= require('../libs/sequelize');
+const { models } = require('../libs/sequelize');
 
 class OrderService {
-  constructor() {
-  }
+  constructor() {}
   async create(data) {
     const newOrder = await models.Order.create(data);
     return newOrder;
   }
+  async addItem(data) {
+    // contiene la relacion con ordenes y productos el OrderProduct
+    const newItem = await models.OrderProduct.create(data);
+    return newItem;
+  }
 
   async find() {
-
+    const rta = await models.Order.findAll({
+      include: ['customer'],
+    });
+    return rta;
   }
 
   async findOne(id) {
     const order = await models.Order.findByPk(id, {
+      // estas asociaciones se hacen aca en el array include y se  pueden hacer tanto en
+      // el objeto especificando o solo el alias de la asociacion
       include: [
         {
           association: 'customer',
-          include: ['user']
-        }
-      ]
+          include: ['user'],
+        },
+        'items',
+      ],
     });
     return order;
   }
 
-  async update(id, changes) {
+  async update(id, changes) {}
 
-  }
-
-  async delete(id) {
-
-  }
-
+  async delete(id) {}
 }
 
 module.exports = OrderService;
