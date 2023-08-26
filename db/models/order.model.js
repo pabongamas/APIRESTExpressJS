@@ -29,17 +29,17 @@ const OrderSchema = {
   // este es un campo  virtual , no es un campo que se va a hacer en la base de datos
   // se debe crear este valor en el objeto despues de ejecutar la migracion , 
   //valor me refiero al campo objeto
-  // total: {
-  //   type: DataTypes.VIRTUAL,
-  //   get() {
-  //     if (this.items.length > 0) {
-  //       return this.items.reduce((total, item) => {
-  //         return total + item.price * item.OrderProduct.amount;
-  //       }, 0);
-  //     }
-  //     return 0;
-  //   },
-  // },
+  total: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      if (this.items.length > 0) {
+        return this.items.reduce((total, item) => {
+          return total + item.price * item.OrderProduct.amount;
+        }, 0);
+      }
+      return 0;
+    },
+  },
 };
 
 class Order extends Model {
