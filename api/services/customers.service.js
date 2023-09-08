@@ -1,5 +1,6 @@
 const { models } = require('./../libs/sequelize');
 const boom = require('@hapi/boom');
+const bcrypt = require('bcrypt');
 
 class CustomersService {
   constructor() {
@@ -11,19 +12,28 @@ class CustomersService {
     //esto para crear un customer normalmente osea crear un customer con un id dado
     // const newCustomer = await models.Customer.create(data);
     //si utilizamos el creacion del customer con la creacion del usuario en el mismo obj
-    //dado debemos hacer esto , crear primero  el usuario con los datos que mandan en el 
+    //dado debemos hacer esto , crear primero  el usuario con los datos que mandan en el
     //objeto user
     // const newUser = await models.User.create(data.user);
-    //en ...data va estar toda la informacion ,esta va a igualarse con el patch y le definimos 
+    //en ...data va estar toda la informacion ,esta va a igualarse con el patch y le definimos
     //el user id para la relacion entre customer y user
     // const newCustomer = await models.Customer.create({
     //     ...data,
     //     userId:newUser.id
     // });
-    //essto anterior se puede mejorar de la siguiente manera 
-     const newCustomer = await models.Customer.create(data,{
-        include:['user']
-     });
+    //essto anterior se puede mejorar de la siguiente manera
+    const hash = await bcrypt.hash(data.user.password, 10);
+    const newData = {
+      ...data,
+      user: {
+        ...data.user,
+        password: hash,
+      },
+    };
+    const newCustomer = await models.Customer.create(newData, {
+      include: ['user'],
+    });
+    delete newCustomer.user.dataValues.password;
     return newCustomer;
   }
 

@@ -1,6 +1,7 @@
 const { faker } = require('@faker-js/faker');
 const { models } = require('./../libs/sequelize');
 const boom = require('@hapi/boom');
+const bcrypt=require('bcrypt');
 // const getConnection=require('../libs/postgres')
 // const pool=require('./../libs/postgres.pool');
 class UsersService {
@@ -21,7 +22,13 @@ class UsersService {
     }
   }
   async create(data) {
-    const newUser = await models.User.create(data);
+    const hash=await bcrypt.hash(data.password,10);
+    const newUser = await models.User.create({
+      ...data,
+      password:hash
+    });
+    //quitar password del usuario creado al retornanr la informacion al frontend
+    delete newUser.dataValues.password;
     return newUser;
   }
 
@@ -41,6 +48,12 @@ class UsersService {
     // const client = await getConnection();
     // const rta = await client.query('SELECT * FROM tasks');
     // return rta.rows;
+  }
+  async findByEmail(email) {
+    const rta = await models.User.findOne({
+      where:{email}
+    });
+    return rta;
   }
 
   async findOne(id) {
