@@ -5,6 +5,8 @@ const usersRouter=require('./usersRouter');
 const categoriesRouter=require('./categoriesRouter');
 const customersRouter=require('./customersRouter');
 const ordersRouter=require('./orders.router');
+const authRouter=require('./auth.router');
+
 
 function routerApi(app){
   const router=express.Router();
@@ -14,6 +16,7 @@ function routerApi(app){
   router.use('/categories',categoriesRouter);
   router.use('/customers',customersRouter);
   router.use('/orders',ordersRouter);
+  router.use('/auth',authRouter);
 
 }
 

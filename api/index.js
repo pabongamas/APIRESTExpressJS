@@ -20,6 +20,7 @@ const options={
   }
 }
 app.use(cors());
+require('./utils/auth');
 
 app.get("/api", checkApiKey,(req, res) =>{
   res.send("Hola mi server en Express");
