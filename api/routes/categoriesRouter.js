@@ -7,7 +7,7 @@ const { createCategorySchema, updateCategorySchema, getCategorySchema } = requir
 const router=express.Router();
 const serviceCategories=new CategoryService();
 
-router.get('/', validatorHandler(getCategorySchema, 'params'), async (req, res, next) => {
+router.get('/', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
   try {
     const categories = await serviceCategories.find();
     res.json(categories);
