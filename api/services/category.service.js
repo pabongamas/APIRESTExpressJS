@@ -20,18 +20,29 @@ class CategoryService {
     const category = await models.Category.findByPk(id, {
       include: ['products']
     });
+    if(!category){
+      throw boom.notFound('Categoria No encontrada');
+    }
     return category;
   }
 
   async update(id, changes) {
-    return {
-      id,
-      changes,
-    };
+    const category = await this.findOne(id);
+    if(!category){
+      throw boom.notFound('Categoria No encontrada');
+    }
+    const rta = await categories.update(changes);
+    return rta;
   }
 
   async delete(id) {
+    const category =  await this.findOne(id);
+    if(!category){
+      throw boom.notFound('Categoria No encontrada');
+    }
+    await category.destroy();
     return { id };
+    
   }
 
 }

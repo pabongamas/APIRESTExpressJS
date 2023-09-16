@@ -3,11 +3,12 @@ const passport = require('passport');
 const CategoryService = require('../services/category.service');
 const validatorHandler = require('./../middlewares/validator.handler');
 const { createCategorySchema, updateCategorySchema, getCategorySchema } = require('./../schemas/category.schema');
+const boom = require('@hapi/boom');
 
 const router=express.Router();
 const serviceCategories=new CategoryService();
-
-router.get('/', passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+const autenticacionJwt= passport.authenticate('jwt', { session: false });
+router.get('/',autenticacionJwt, async (req, res, next) => {
   try {
     const categories = await serviceCategories.find();
     res.json(categories);
@@ -17,6 +18,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
 });
 
 router.get('/:id',
+autenticacionJwt,
   validatorHandler(getCategorySchema, 'params'),
   async (req, res, next) => {
     try {
@@ -28,8 +30,7 @@ router.get('/:id',
     }
   }
 );
-router.post('/',
-  passport.authenticate('jwt', { session: false }),
+router.post('/',autenticacionJwt,
   validatorHandler(createCategorySchema, 'body'),
   async (req, res, next) => {
     try {
@@ -37,12 +38,15 @@ router.post('/',
       const newCategory = await serviceCategories.create(body);
       res.status(201).json(newCategory);
     } catch (error) {
+      console.log("acaaaaa bvoy");
       next(error);
     }
   }
 );
 
-router.patch('/:id',
+router.patch(
+  '/:id',
+  autenticacionJwt,
   validatorHandler(getCategorySchema, 'params'),
   validatorHandler(updateCategorySchema, 'body'),
   async (req, res, next) => {
@@ -54,20 +58,22 @@ router.patch('/:id',
     } catch (error) {
       next(error);
     }
-  }
+  },
 );
 
-router.delete('/:id',
+router.delete(
+  '/:id',
+  autenticacionJwt,
   validatorHandler(getCategorySchema, 'params'),
   async (req, res, next) => {
     try {
       const { id } = req.params;
       await serviceCategories.delete(id);
-      res.status(201).json({id});
+      res.status(201).json({ id });
     } catch (error) {
       next(error);
     }
-  }
+  },
 );
 
 module.exports=router;
