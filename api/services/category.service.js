@@ -31,7 +31,7 @@ class CategoryService {
     if(!category){
       throw boom.notFound('Categoria No encontrada');
     }
-    const rta = await categories.update(changes);
+    const rta = await category.update(changes);
     return rta;
   }
 
