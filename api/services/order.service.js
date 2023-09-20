@@ -4,8 +4,21 @@ const { models } = require('../libs/sequelize');
 
 class OrderService {
   constructor() {}
-  async create(data) {
-    const newOrder = await models.Order.create(data);
+  async create(userId) {
+   
+    const customer=await models.Customer.findOne({
+      where:{'$user.id$':userId},
+      include:[
+        {
+          association:'user',
+        }
+      ]
+    })
+    if (!customer) {
+      throw boom.badRequest('Customer not found');
+    }
+    const customerId=customer.id;
+    const newOrder = await models.Order.create({"customerId":customerId});
     return newOrder;
   }
   async addItem(data) {
