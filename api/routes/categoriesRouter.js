@@ -9,7 +9,7 @@ const boom = require('@hapi/boom');
 const router=express.Router();
 const serviceCategories=new CategoryService();
 const autenticacionJwt= passport.authenticate('jwt', { session: false });
-router.get('/',autenticacionJwt,checkRoles(['admin','customer']), async (req, res, next) => {
+router.get('/',autenticacionJwt,checkRoles('admin','customer'), async (req, res, next) => {
   try {
     const categories = await serviceCategories.find();
     res.json(categories);
